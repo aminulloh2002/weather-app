@@ -135,5 +135,5 @@ body {
 .loader,
 .weather-error {
   text-align: center;
-  height: 1rem;
+  /* height: 1rem; */
 }

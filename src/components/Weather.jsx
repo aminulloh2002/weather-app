@@ -1,76 +1,9 @@
-import { useCallback, useEffect, useReducer } from "react";
 import { SyncLoader } from "react-spinners";
-import { getWeatherByCity, getWeatherByLatLong } from "../util/weather-api";
-
-const initialState = {
-    weatherData: null,
-    city: "",
-    isLoading: false,
-    isError: false,
-}
-
-const weatherReducer = (state, action) => {
-    switch (action.type) {
-        case 'setCity':
-            return { ...state, city: action.value }
-        case 'setLoading':
-            return { ...state, isLoading: action.value }
-        case 'setError':
-            return { ...state, isError: action.value }
-        case 'setWeatherData':
-            return { ...state, weatherData: action.value }
-        case 'reset':
-            return initialState
-        default:
-            return { ...state }
-    }
-
-}
+import useWeather from "../hooks/useWeather";
 
 const Weather = () => {
-    const [state, dispatch] = useReducer(weatherReducer, initialState)
-
-    const {weatherData, city, isLoading, isError} = state
-
-    const currentPosition = useCallback(async position => {
-        const lat = position.coords.latitude
-        const long = position.coords.longitude
-        try {
-            dispatch({ type: "setLoading", value: true })
-            const weather = await getWeatherByLatLong(lat, long)
-            dispatch({ type: "setWeatherData", value: weather })
-        } catch (err) {
-            dispatch({ type: "setError", value: true })
-        }
-        dispatch({ type: "setLoading", value: false })
-    }, [])
-
-    useEffect(() => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(currentPosition)
-        }
-    }, [currentPosition])
-
-    useEffect(() => {
-        if (city) {
-            dispatch({ type: "setLoading", value: true })
-            dispatch({ type: "setError", value: false })
-            const fetchWeatherByCity = setTimeout(async () => {
-                try {
-                    const weather = await getWeatherByCity(city)
-                    dispatch({ type: "setWeatherData", value: weather })
-                } catch (err) {
-                    dispatch({ type: "setError", value: true })
-                }
-                dispatch({ type: "setLoading", value: false })
-            }, 1000)
-
-            return () => clearTimeout(fetchWeatherByCity)
-        } else {
-            dispatch({ type: "reset" })
-        }
-    }, [city])
-
+    const { weatherData, city, isLoading, isError, dispatch } = useWeather()
+   
     const cityChangeHandler = (value) => {
         dispatch({ type: "setCity", value })
     }
@@ -92,7 +25,7 @@ const Weather = () => {
 
     if (isError) {
         result = <div className="result-box">
-            <p className="weather-error">Weather not found...</p>
+            <h3 className="weather-error">Weather not found...</h3>
         </div>
     }
 
