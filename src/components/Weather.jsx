@@ -54,6 +54,7 @@ const Weather = () => {
     useEffect(() => {
         if (city) {
             dispatch({ type: "setLoading", value: true })
+            dispatch({ type: "setError", value: false })
             const fetchWeatherByCity = setTimeout(async () => {
                 try {
                     const weather = await getWeatherByCity(city)

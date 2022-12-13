@@ -109,7 +109,7 @@ body {
   text-transform: capitalize;
 }
 
-.result-box>* {
+.result-box>*:not(.loader) {
   animation: 1s moveInRight ease-out;
 }
 
