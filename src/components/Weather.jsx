@@ -1,26 +1,48 @@
-import { useCallback, useEffect, useState } from "react";
-import { DebounceInput } from "react-debounce-input"
+import { useCallback, useEffect, useReducer } from "react";
 import { SyncLoader } from "react-spinners";
 import { getWeatherByCity, getWeatherByLatLong } from "../util/weather-api";
 
+const initialState = {
+    weatherData: null,
+    city: "",
+    isLoading: false,
+    isError: false,
+}
+
+const weatherReducer = (state, action) => {
+    switch (action.type) {
+        case 'setCity':
+            return { ...state, city: action.value }
+        case 'setLoading':
+            return { ...state, isLoading: action.value }
+        case 'setError':
+            return { ...state, isError: action.value }
+        case 'setWeatherData':
+            return { ...state, weatherData: action.value }
+        case 'reset':
+            return initialState
+        default:
+            return { ...state }
+    }
+
+}
+
 const Weather = () => {
-    const [city, setCity] = useState('');
-    const [weatherData, setWeatherData] = useState(null)
-    const [isLoading, setIsLoading] = useState(false)
-    const [isError, setIsError] = useState(false)
+    const [state, dispatch] = useReducer(weatherReducer, initialState)
+
+    const {weatherData, city, isLoading, isError} = state
 
     const currentPosition = useCallback(async position => {
         const lat = position.coords.latitude
         const long = position.coords.longitude
         try {
-            setIsLoading(true)
+            dispatch({ type: "setLoading", value: true })
             const weather = await getWeatherByLatLong(lat, long)
-            console.log(weather)
-            setWeatherData(weather)
+            dispatch({ type: "setWeatherData", value: weather })
         } catch (err) {
-            setIsError(true)
+            dispatch({ type: "setError", value: true })
         }
-        setIsLoading(false)
+        dispatch({ type: "setLoading", value: false })
     }, [])
 
     useEffect(() => {
@@ -29,21 +51,27 @@ const Weather = () => {
         }
     }, [currentPosition])
 
-    const fetchWeatherByCity = async city => {
-        setIsLoading(true)
-        setIsError(false)
-        try {
-            const weather = await getWeatherByCity(city)
-            setWeatherData(weather)
-        } catch (err) {
-            setIsError(true)
+    useEffect(() => {
+        if (city) {
+            dispatch({ type: "setLoading", value: true })
+            const fetchWeatherByCity = setTimeout(async () => {
+                try {
+                    const weather = await getWeatherByCity(city)
+                    dispatch({ type: "setWeatherData", value: weather })
+                } catch (err) {
+                    dispatch({ type: "setError", value: true })
+                }
+                dispatch({ type: "setLoading", value: false })
+            }, 1000)
+
+            return () => clearTimeout(fetchWeatherByCity)
+        } else {
+            dispatch({ type: "reset" })
         }
-        setIsLoading(false)
-    }
+    }, [city])
 
     const cityChangeHandler = (value) => {
-        setCity(value)
-        fetchWeatherByCity(value)
+        dispatch({ type: "setCity", value })
     }
 
     let result;
@@ -67,6 +95,7 @@ const Weather = () => {
         </div>
     }
 
+
     if (weatherData && !isLoading && !isError) {
         const { name } = weatherData;
         const { icon, description } = weatherData.weather[0];
@@ -85,10 +114,9 @@ const Weather = () => {
     return <>
         <div className="input-box">
             <h1 className="title">Type A City...</h1>
-            <DebounceInput
+            <input
                 className="input-control"
                 value={city}
-                debounceTimeout={2000}
                 onChange={event => cityChangeHandler(event.target.value)}
             />
         </div>
