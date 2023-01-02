@@ -9,7 +9,7 @@
 body {
   background-color: lightskyblue;
   box-sizing: border-box;
-  background-image: url("https://source.unsplash.com/1600x900/?nature");
+  background-image: linear-gradient(rgba(0, 0, 0, .25), rgba(0, 0, 0, .25)), url("https://source.unsplash.com/1600x900/?nature");
   background-repeat: no-repeat;
   background-size: cover;
   height: 100vh;
@@ -19,12 +19,12 @@ body {
 
 @media only screen and (max-width:600px) {
   html {
-    font-size:55%;
+    font-size: 55%;
   }
 
   body {
     /* background-image: url("https://pixboost.com/api/2/img/https://images.unsplash.com/photo-1519681393784-d120267933ba/resize?size=1600x900&auth=MjE3NzAwNDQ1MQ__"); */
-    background-image: url("https://source.unsplash.com/600x1200/?nature");
+    background-image: linear-gradient(rgba(0, 0, 0, .25), rgba(0, 0, 0, .25)), url("https://source.unsplash.com/600x1200/?nature");
   }
 }
 
@@ -59,6 +59,7 @@ body {
   text-align: center;
   text-transform: capitalize;
   color: #fff;
+  text-decoration: none;
 }
 
 .input-control:focus {
