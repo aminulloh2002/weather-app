@@ -3,7 +3,7 @@ import useWeather from "../hooks/useWeather";
 
 const Weather = () => {
     const { weatherData, city, isLoading, isError, dispatch } = useWeather()
-   
+    console.log(weatherData)
     const cityChangeHandler = (value) => {
         dispatch({ type: "setCity", value })
     }
@@ -38,7 +38,7 @@ const Weather = () => {
 
         result = <div className="result-box">
             <h2 className='weather-location'>Weather in {name}</h2>
-            <h1 className='weather-temprature'>{temp}°C</h1>
+            <h1 className='weather-temperature'>{temp}°C</h1>
             <div className='cloud-condition'> <img src={`https://openweathermap.org/img/wn/${icon}.png`} /> <span> {description} </span></div>
             <p className='humidity'>Humidity: {humidity}%</p>
             <p className='wind-speed'>Wind Speed: {speed} km/h</p>
